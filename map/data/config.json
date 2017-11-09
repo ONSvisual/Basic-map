@@ -1,0 +1,26 @@
+{"ons":{
+"datanames": ["chnglem", "chnglef"],
+"varlabel": ["Change Male", "Change Female"],
+"varcolour": [
+	["#f1eef6","#bdc9e1","#74a9cf","#0570b0"],
+	["#fef0d9","#fdcc8a","#fc8d59","#d7301f"]
+],
+"varname": ["Change Male","Healthy life Exp Female"],
+"varload": "Change Male",
+"varunit": ["change in months","change in months"],
+"varprefix": ["",""],
+"breaks": ["jenks","jenks"],
+
+"yAxisScale":[[-30,50], [-30,50]],
+"dropXtick": 4,
+"averagelabel": "UK",
+"centre": [54.5,-3.3],
+"zoom": 5.3,
+"sourceLabel": "Life expectancy, ONS",
+"sourceURL": "http://www.ons.gov.uk",
+"nonStdScale": ["6","7","8","9","10","11","12","13","14","15","16"],
+"chartLabels": ["09-11","10-12","11-13","12-14","13-15","09-11","10-12","11-13","12-14","13-15","14-16"],
+"timelineLabelsMB": ["04-06","","06-08","","08-10","","10-12","","12-14","","14-16"],
+"timelineLabelsDT": ["04-06","05-07","06-08","07-09","08-10","09-11","10-12","11-13","12-14","13-15","14-16"],
+"circles": "false"  
+}}
