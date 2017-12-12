@@ -27,7 +27,7 @@
 	first = true;
 	selected=false;
 
-	function ready (error, data, config){ console.log("F ready")
+	function ready (error, data, config){
 
 	data2 = data;
 
@@ -44,8 +44,6 @@ function chooseColor(){
 }
 
 	dvc.time = "yr" + config.ons.chartLabels.length;
-
-console.log("dvc.time " + dvc.time);
 
 	dvc.curr = config.ons.varload;
 
@@ -88,11 +86,9 @@ console.log("dvc.time " + dvc.time);
 	if(config.ons.breaks[0] =="jenks")
 		{	dvc.jenksSteps = 4;
 			breaks = ss.jenks(allvalues, dvc.jenksSteps);
-			//console.log("jenk1: ", a,breaks, dvc.jenksSteps);
 		}
 	else {	breaks = config.ons.breaks[a];
 			dvc.jenksSteps = config.ons.breaks[a].length - 1; };
-	 //[69,75,80,85,90], [69,75,80,85,90], [13,16,19,22,25], [13,16,19,22,25]
 
 	//Set-up and create an object variable to hold the data for the currently selected variable and the
 	rateById = {};
@@ -149,7 +145,7 @@ console.log("dvc.time " + dvc.time);
 
 
 
-	function click(d) { //console.log(this);
+	function click(d) {
 				  if (d3.event.defaultPrevented) return;
 
 				  selectArea(this);
@@ -177,7 +173,7 @@ console.log("dvc.time " + dvc.time);
 
     }
 
-	function selectArea(xx) { //console.log("ƒ selectArea");
+	function selectArea(xx) {
 
 				selected=true;
 				myId = d3.select(xx).attr("class").split(' ')[0];
@@ -267,13 +263,11 @@ console.log("dvc.time " + dvc.time);
     											rgbArray[i] = rgbArray[i].replace(/\D/g,"");
     													});
 
-    								//console.log(fullColorHex(rgbArray[0],rgbArray[1],rgbArray[2]));
     							dvc.scaleId = fullColorHex(rgbArray[0],rgbArray[1],rgbArray[2]);
-    							//console.log(dvc.scaleId);
     							d3.select("#pill"+dvc.scaleId).style("stroke", "#b4005a").style("stroke-width", 2);
                 } // ends if
                 else{
-                  hex2 = shade1.split('#')[1]; //console.log("hex given:"+hex2);
+                  hex2 = shade1.split('#')[1];
                   d3.select("#pill"+hex2).style("stroke", "#b4005a").style("stroke-width", 2);
                 }
     	}
@@ -385,7 +379,7 @@ console.log("dvc.time " + dvc.time);
 
       // nonStdScale is a linear time period in the config as some timescales used are 11-12.
 			natdata = d3.zip(config.ons.nonStdScale, averages);
-			//console.log(natdata);
+
 			var margin = {top: 180, right: 25, bottom: 10, left: 30};
 			var chart_width = $("#chartPane").width() - margin.left - margin.right;
 
@@ -1017,7 +1011,6 @@ console.log("dvc.time " + dvc.time);
 			} else {
 				breaks = config.ons.breaks[a];
 			};
-			//console.log("jenk2: ", a,breaks, dvc.jenksSteps);
 
 			//Set-up and create an object variable to hold the data for the currently selected variable and the year
 			rateById = {};
