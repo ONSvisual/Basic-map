@@ -21,33 +21,31 @@
 	//Check whether inline svg is supported
 	if(Modernizr.inlinesvg) {
 	d3.select("#graphic").remove();
-	dvc = {};
 
+	dvc = {};
 
 	first = true;
 	selected=false;
 
-	function ready (error, data, config){
+	function ready (error, data, config){ console.log("F ready")
 
 	data2 = data;
 
-	a = 0;
+	a = 0; // tab instance
 
-	chooseColor();
+  chooseColor();
 
-	function chooseColor(){
-
+function chooseColor(){
 		if(config.ons.varcolour instanceof Array) {
 			dvc.colour = config.ons.varcolour[a]
 		} else {
 			dvc.colour = eval("colorbrewer." + config.ons.varcolour);
 		}
+}
 
-	}
+	dvc.time = "yr" + config.ons.chartLabels.length;
 
-  headings = d3.keys(data[0]).filter(function(key){  return key !="AREACD" && key !="AREANM" });
-  // change "yr" to data[0] ! AREACD/NM
-  dvc.time = "yr" + headings.length; // display last year
+console.log("dvc.time " + dvc.time);
 
 	dvc.curr = config.ons.varload;
 
@@ -55,6 +53,7 @@
 	dvc.unittext = config.ons.varunit[a];
 	dvc.label = config.ons.varlabel[a];
 	dvc.prefix = config.ons.varprefix[a];
+	dvc.yAxisLabel = config.ons.yAxisLabel;
 
 	config2 = config;
 
@@ -65,8 +64,8 @@
 
 	// Work out how many years we have in our dataset; number of rows - area name & code // Look at linechart templates to see how?
 	    // parse data into columns
-			var cols = -2; // set to -2 as that's the number of non-data columns AREANM, AREACD
-		    var values = [],
+			var cols = -2; // set to -2 as that's the number of non-data columns
+      var values = [],
 				allvalues = [],
 				averages = [];
 
@@ -75,13 +74,14 @@
 		        if (column != 'AREANM' && column != 'AREACD') {
 		        values[column] =  data.map(function(d) {return +eval("d." + column); }).filter(function(d) {return !isNaN(d)}).sort(d3.ascending);
 
-				                    averages.push(d3.mean(values[column]));
-                    				allvalues = allvalues.concat(values[column]);
-                    				}
+        averages.push(d3.mean(values[column]));
+				allvalues = allvalues.concat(values[column]);
+				}
+
 		    }
 
 	allvalues.sort(d3.ascending);
-	//console.log("data:",averages, d3.min(allvalues), d3.max(allvalues) );
+
 
 	//Create a flat array of all the values of earnings / filter out any non-numbers / sort in ascending order ready to pass to jenks algorithm
 
@@ -92,14 +92,13 @@
 		}
 	else {	breaks = config.ons.breaks[a];
 			dvc.jenksSteps = config.ons.breaks[a].length - 1; };
+	 //[69,75,80,85,90], [69,75,80,85,90], [13,16,19,22,25], [13,16,19,22,25]
 
 	//Set-up and create an object variable to hold the data for the currently selected variable and the
 	rateById = {};
 	areaById = {};
 
-	data.forEach(function(d) { rateById[d.AREACD] = +eval("d." + dvc.time);
-                             areaById[d.AREACD] = d.AREANM
-                            });
+	data.forEach(function(d) { rateById[d.AREACD] = +eval("d." + dvc.time); areaById[d.AREACD] = d.AREANM});
 
 
 	var layerx = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png',{
@@ -131,32 +130,31 @@
 			$.getJSON('map/data/geog.json').done(addTopoData);
 
 
-function addTopoData(topoData){
+    function addTopoData(topoData){
 			  topoLayer.addData(topoData);
 			  topoLayer.eachLayer(handleLayer);
 			  topoLayer.addTo(map);
 
-			  d3.select(".leaflet-overlay-pane").selectAll("path").attr("stroke", "#ccc").attr("fill-opacity",0.8).attr("stroke-width",0.5);
+			  d3.select(".leaflet-overlay-pane").selectAll("path").attr("fill-opacity",0.8).attr("stroke-width",0.8);
 
 			  dragging = d3.behavior.drag()
 					.on('dragstart', function () {
 			  })
 
 			  var xy = d3.select(".leaflet-overlay-pane").selectAll("path");
-//console.log(xy);
+
 			  xy.on("mouseout",leaveLayer).on("mouseover",enterLayer).call(dragging).on('click', click);
 
-	}  // end funtion ready aka addTopoData
+	}  // end funtion ready
 
 
 
 	function click(d) { //console.log(this);
+				  if (d3.event.defaultPrevented) return;
 
-				  if (d3.event.defaultPrevented) return; // if dragged => go back
-
-               selectArea(this);
-     				   highlightKey(this);
-				       }
+				  selectArea(this);
+				  highlightKey(this);
+				}
 
 			drawChart(dvc.curr);
 			timeSlider();
@@ -168,18 +166,18 @@ function addTopoData(topoData){
 
 		fillColor = color(rateById[x]);
 
-      layer.setStyle({
-		      fillColor: fillColor,
+        layer.setStyle({
+		  fillColor: fillColor,
           fillOpacity: 0.8,
-          color:'#F5F5DC',
+          color:'#ccc',
           weight:0.8,
           opacity:1,
-		      className: x
+		  className: x
         });
 
     }
 
-	function selectArea(xx) {
+	function selectArea(xx) { //console.log("ƒ selectArea");
 
 				selected=true;
 				myId = d3.select(xx).attr("class").split(' ')[0];
@@ -197,18 +195,19 @@ function addTopoData(topoData){
 
 				pymChild.sendMessage('navigate', indexarea + " " + dvc.time);
 
+
 	}
 
 
 
 	function enterLayer(){
 		currclass = d3.select(this).attr("class").split(' ')[0];
-
-          		d3.select('#selected').remove();
-          		highlightArea();
+		d3.select('#selected').remove();
+		highlightArea();
+    highlightKey(this);
 	}
 
-    function highlightArea(){ // on rollover
+    function highlightArea(){
 
 		leaveLayer();
 
@@ -225,7 +224,6 @@ function addTopoData(topoData){
 				.attr("stroke-width", "2");
 
 				myCol = d3.select(".leaflet-overlay-pane");
-		//console.log(currpath, myCol);
 
 		/* Display name of area*/
 		d3.select("#areanm").text(areaById[currclass]);
@@ -237,42 +235,49 @@ function addTopoData(topoData){
 
 	var number = parseInt(subst)-1;
 
-		d3.select("#areainfo").html(function(d,i){if (!isNaN(rateById[currclass]))  {return dvc.prefix + format(rateById[currclass]) + "<span>" + " "+dvc.unittext + "</span>"} else {return "Data unavailable"}});
+		d3.select("#areainfo").html(function(d,i){if (!isNaN(rateById[currclass]))  {return dvc.prefix + format(rateById[currclass]) + "<span>" + " "+dvc.yAxisLabel + "</span>"} else {return "Data unavailable"}});
 
 		drawChart(currclass);
 
     }
 
 
-	function highlightKey(pill){
+    function highlightKey(pill){
+        shade1 = d3.select(pill).style("fill");
+        if(shade1.substr(0,3) === 'rgb'){
+    		   // shade = d3.select(pill).style("fill").split('#')[0];
 
-		 shade = d3.select(pill).style("fill").split('#')[0];
+    				  var rgbToHex = function (rgb) {
+    												  var hex = Number(rgb).toString(16);
+    												  if (hex.length < 2) {
+    													   hex = "0" + hex;
+    												  }
+    											  return hex;
+    											};
 
-				  var rgbToHex = function (rgb) {
-												  var hex = Number(rgb).toString(16);
-												  if (hex.length < 2) {
-													   hex = "0" + hex;
-												  }
-											  return hex;
-											};
+    						var fullColorHex = function(r,g,b) {
+    															  var red = rgbToHex(r);
+    															  var green = rgbToHex(g);
+    															  var blue = rgbToHex(b);
+    															  return red+green+blue;
+    															};
+    								rgbArray = shade1.split(',');
 
-						var fullColorHex = function(r,g,b) {
-															  var red = rgbToHex(r);
-															  var green = rgbToHex(g);
-															  var blue = rgbToHex(b);
-															  return red+green+blue;
-															};
-								rgbArray = shade.split(',');
-								rgbArray.forEach(function(d,i) {
-											rgbArray[i] = rgbArray[i].replace(/\D/g,"");
-													});
+    								rgbArray.forEach(function(d,i) {
+    											rgbArray[i] = rgbArray[i].replace(/\D/g,"");
+    													});
 
-								//console.log(fullColorHex(rgbArray[0],rgbArray[1],rgbArray[2]));
-							dvc.scaleId = fullColorHex(rgbArray[0],rgbArray[1],rgbArray[2]);
-							//console.log(dvc.scaleId);
-							d3.select("#pill"+dvc.scaleId).style("stroke", "#b4005a").style("stroke-width", 2);
+    								//console.log(fullColorHex(rgbArray[0],rgbArray[1],rgbArray[2]));
+    							dvc.scaleId = fullColorHex(rgbArray[0],rgbArray[1],rgbArray[2]);
+    							//console.log(dvc.scaleId);
+    							d3.select("#pill"+dvc.scaleId).style("stroke", "#b4005a").style("stroke-width", 2);
+                } // ends if
+                else{
+                  hex2 = shade1.split('#')[1]; //console.log("hex given:"+hex2);
+                  d3.select("#pill"+hex2).style("stroke", "#b4005a").style("stroke-width", 2);
+                }
+    	}
 
-	}
 
 
 	function leaveLayer(){
@@ -297,8 +302,22 @@ function addTopoData(topoData){
 
 	function timeSlider() {
 
-		$(window).resize(function(){$("#slide").slider('destroy');
-    initiateSlider()});
+	//Make a slider so that the user can select the time period that they are interested in
+//		d3.select("#mapPane").append("div").attr("id","sliderInc").append("div").attr("id","slider");
+//		dvc.low = 1
+//
+//		$('#slider').labeledslider({min:0, max:4, values: dvc.low, tickInterval:1,  range: true, step:1, change:function(event,ui){
+//
+//			dvc.time = ui.values[0];
+//
+//		}});
+//
+//		labels = ['Mon', 'Tue', 'Wed', 'Thu'];
+//
+//		$('#slider').labeledslider( 'option', 'tickLabels', labels );
+
+
+		$(window).resize(function(){$("#slide").slider('destroy'); initiateSlider()});
 
 		d3.select("#timeSlider").append("div").attr("id","slide");
 
@@ -355,6 +374,7 @@ function addTopoData(topoData){
 	}
 
 
+
 	function drawChart(currid){
 
 		if(first){
@@ -362,10 +382,10 @@ function addTopoData(topoData){
 			second = true;
 
 			//Start drawing chart
-			//natvalues = config2.ons.average[a];
+
+      // nonStdScale is a linear time period in the config as some timescales used are 11-12.
 			natdata = d3.zip(config.ons.nonStdScale, averages);
 			//console.log(natdata);
-
 			var margin = {top: 180, right: 25, bottom: 10, left: 30};
 			var chart_width = $("#chartPane").width() - margin.left - margin.right;
 
@@ -391,14 +411,16 @@ function addTopoData(topoData){
 		        .orient("bottom")
 		        .tickFormat(function(d,i) {
 		           var fmt = d3.time.format("%y");
-				   nxtyr = +fmt(d) +1;
-		           //return '\u2019' + fmt(d);
-				   if(i%2){
-				   return fmt(d) + "/" + nxtyr;
-				   }
+          //  This has been added for format years 04/05  06/07...
+           //nxtyr = +fmt(d) +1;
+				   //if(i%2){
+				   return fmt(d) //+ "/" + nxtyr;
+				   //}
 		        })
 				.tickPadding(5)
 				.ticks(5);
+
+
 
 	        //specify number of ticks on x axis and whether 1st and last data point labels are included
 //	        if(graphic.width()<threshold_sm){
@@ -446,7 +468,7 @@ function addTopoData(topoData){
 		    yAxis = d3.svg.axis()
 		        .scale(ychart)
 		        .orient('left')
-				    .ticks(6);
+				.ticks(6);
 
 		    //create svg for chart
 		    svg = d3.select('#chartPane').append('svg')
@@ -459,12 +481,12 @@ function addTopoData(topoData){
 					svg.append("text")
 						.attr("id","ylabel")
 						.attr("transform", "translate(-20,-12)")
-						.text(/*capitalizeFirstLetter*/(dvc.unittext));
+						.text(dvc.unittext);
 
 					svg.append("text")
 						.attr("id","ylabel")
-						.attr("x",xchart(d3.time.format("%y").parse(natdata[(cols-1)][0])) + 6)
-						.attr("y",ychart(natdata[(cols-1)][1]) + 6)
+						.attr("x",xchart(d3.time.format("%y").parse(natdata[(cols-1)][0]))+6)
+						.attr("y",ychart(natdata[(cols-1)][1])+6)
 						.text(config.ons.averagelabel);
 
 
@@ -509,7 +531,7 @@ function addTopoData(topoData){
 				svg.append("g")
 					.attr("id","natcircles")
 					.selectAll("circle")
-					.data(averages) // was natvalues
+					.data(averages)
 					.enter()
 					.append("circle")
 					.attr("opacity",1)
@@ -537,28 +559,29 @@ function addTopoData(topoData){
 			}
 
 		} // ends first time draw
-		else if(second){ // for second time - chart already there
+		else if(second){
 
 			second = false;
 			namesall = d3.keys(data2[0]).filter(function(key) { return key !== "AREANM"; });
 
-			currdata = data2.filter(function(d) {return d.AREACD == currid});
-//console.log(currdata); // no data to zip if area rolled over is grey
+			currdata = data2.filter(function(d) {return d.AREACD ==currid});
 
 			currdata.forEach(function(d) {
 				  valuesx = namesall.map(function(name) { return +d[name]});
 			});
 
+
+
 			names = namesall.slice(1);
+
 			values = valuesx.slice(1);
 
 			linedata = d3.zip(config.ons.nonStdScale,values);
-      //console.log(linedata);
 
 			line1 = d3.svg.line()
 				//.defined(function(linedata){ return linedata[1] != null;})
 				.defined(function(linedata) { return !isNaN(linedata[1]); })
-		        .x(function(d,i) { return xchart(d3.time.format("%y").parse(linedata[i][0])) } )
+		        .x(function(d,i) { return xchart(d3.time.format("%y").parse(linedata[i][0]))})
 		        .y(function(d,i) { return ychart(linedata[i][1]); });
 
 		 	svg.append("path")
@@ -570,7 +593,7 @@ function addTopoData(topoData){
 				svg.append("g")
 						.attr("id","localcircles")
 						.selectAll("circle")
-						.data(averages) // was natvalues
+						.data(averages)
 						.enter()
 						.append("circle")
 						.attr("opacity",1)
@@ -659,7 +682,7 @@ function addTopoData(topoData){
 		    .orient("bottom")
     		.tickSize(15)
 		    .tickValues(color.domain())
-			.tickFormat(d3.format(".1f"));
+			.tickFormat(d3.format(".f"));
 
 
 		var yAxis = d3.svg.axis()
@@ -748,7 +771,6 @@ function addTopoData(topoData){
 
 
 			a = dvc.varname.indexOf(dvc.curr);
-			console.log("ƒ nav:"+a);
 			dvc.unittext = dvc.varunit[a];
 			dvc.label = data.ons.varlabel[a];
 			dvc.prefix = data.ons.varprefix[a];
@@ -802,6 +824,7 @@ function addTopoData(topoData){
 
 			d3.select("#varsel").html(dvc.label + " <span class='caret'></span>");
 
+// mobile
 			dropnext = d3.select("#menu").append("ul")
 					.attr("class","dropdown-menu")
 					.attr("role","menu");
@@ -892,7 +915,6 @@ function addTopoData(topoData){
 			});
 
 	};
-
 	playTime();
 
 	function playTime() {
@@ -955,10 +977,10 @@ function addTopoData(topoData){
 		if(myId != null) {
 			highlightArea();
 			d3.select(".leaflet-overlay-pane").selectAll("path").on("mouseout",null).on("mouseover",null);
-			d3.select("#areainfo").html(function(d,i){if (!isNaN(rateById[currclass]))  {return dvc.prefix + format(rateById[currclass]) + "<span>" +" "+ dvc.unittext + "</span>"} else {return "Data unavailable"}});
+			d3.select("#areainfo").html(function(d,i){if (!isNaN(rateById[currclass]))  {return dvc.prefix + format(rateById[currclass]) + "<span>" +" "+ dvc.yAxisLabel + "</span>"} else {return "Data unavailable"}});
 		}
 
-		d3.select(".leaflet-overlay-pane").selectAll("path").attr("stroke", "#ccc").attr("fill-opacity",0.8).attr("stroke-width",0.5);
+		d3.select(".leaflet-overlay-pane").selectAll("path").attr("fill-opacity",0.8).attr("stroke-width",0.8);
 
 
 	}
@@ -974,7 +996,7 @@ function addTopoData(topoData){
 				// Work out how many years we have in our dataset; number of rows - area name & code // Look at linechart templates to see how?
 				// parse data into columns
 					var cols = -2; // set to -2 as that's the number of non-data columns
-					var values = []
+          var values = []
 						allvalues = [],
 						averages = [];
 
@@ -983,9 +1005,8 @@ function addTopoData(topoData){
 						if (column != 'AREANM' && column != 'AREACD') {
 						values[column] =  data.map(function(d) { return +eval("d." + column); }).filter(function(d) {return !isNaN(d)}).sort(d3.ascending);
 
-						averages.push(d3.mean(values[column]));
-
-						allvalues = allvalues.concat(values[column]);
+            averages.push(d3.mean(values[column]));
+            allvalues = allvalues.concat(values[column]);
 						}
 					}
 
@@ -993,11 +1014,10 @@ function addTopoData(topoData){
 
 			if(config.ons.breaks[a] =="jenks"){
 				breaks = ss.jenks(allvalues, 4);
-
 			} else {
 				breaks = config.ons.breaks[a];
 			};
-
+			//console.log("jenk2: ", a,breaks, dvc.jenksSteps);
 
 			//Set-up and create an object variable to hold the data for the currently selected variable and the year
 			rateById = {};
@@ -1024,7 +1044,7 @@ function addTopoData(topoData){
 
 				xy.on("mouseout",leaveLayer).on("mouseover",enterLayer).call(dragging).on('click', click);
 
-			d3.select(".leaflet-overlay-pane").selectAll("path").attr("stroke", "#ccc").attr("fill-opacity",0.8).attr("stroke-width",0.5);
+			d3.select(".leaflet-overlay-pane").selectAll("path").attr("stroke-width", 0.8).attr("fill-opacity", 0.8)
 		});
 
 
@@ -1038,7 +1058,7 @@ function addTopoData(topoData){
 
 	//Load data and config file
 	queue()
-		.defer(d3.csv, "map/data/chnglem.csv")
+		.defer(d3.csv, "map/data/lem.csv")
 		.defer(d3.json, "map/data/config.json")
 		.await(ready);
 

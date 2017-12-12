@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <title>Change in LE, UK</title>
+  <title>Basic map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="stylesheet" href="map/css/leaflet.css" />
@@ -21,33 +21,12 @@
 
   }
 
-  #Lifesat {
-	  border-bottom:5px;
-	  border-bottom-style:solid;
-	  border-bottom-color:rgb(44,162,95);
-  }
-  #Worth {
-	  border-bottom:5px;
-	  border-bottom-style:solid;
-	  border-bottom-color:rgb(129,15,124);
-  }
-  #Happy {
-	  border-bottom:5px;
-	  border-bottom-style:solid;
-	  border-bottom-color:rgb(217,95,14);
-  }
-  #Anxious {
-	  border-bottom:5px;
-	  border-bottom-style:solid;
-	  border-bottom-color:rgb(43,140,190);
-  }
-
 
  .container-fluid, .footer{
 fill:white;
 	}
 
-  *{
+  {
     margin:0;
     padding:0;
     -webkit-box-sizing:border-box;
@@ -239,46 +218,28 @@ fill:white;
 		top: 30px;
 	}
 
-/*	@media (min-width: 598px) {
-
-	#keydiv {
-
-		top:72px;
-		width:100px;
-		height:462px;
-		right:33%;
-	}
-
-
-	#key {
-		width:140px;
-		height:462px;
-	}
-	}
-*/
-
 	#key {
 		height:70px;
 	}
 
 	@media (max-width: 597px) {
 
-	#mapPane {
-		width: 100%;
-	}
+            	#mapPane {
+            		width: 100%;
+            	}
 
-	#keydiv {
-		top:0px;
-	}
+            	#keydiv {
+            		top:0px;
+            	}
 
-	#key {
-		height:70px;
-	}
-	.chosen-container {
-		top: 5px;
-		z-index:1002;
-	}
-	}*/
+            	#key {
+            		height:70px;
+            	}
+            	.chosen-container {
+            		top: 5px;
+            		z-index:1002;
+            	}
+	 }
 
 
 
@@ -415,12 +376,9 @@ fill:white;
 
 		 #chartPane #ylabel/* required */
 		{
-
             font-size: 12px;
             fill: #666;
-
         }
-
 
 
 		/* y-axis units label */
@@ -434,7 +392,6 @@ fill:white;
 			height:20px;
 			display:block;
 			float:none;
-
         }
 
 		#line1 { stroke: #008cba; stroke-width:2px}
@@ -493,7 +450,7 @@ fill:white;
 			margin-top:8px;
 		}
 
-		#submitbut {
+		.submitbut {
 			background-color:#0F8243;
 			display:block;
 			width:200px;
@@ -508,7 +465,7 @@ fill:white;
 			margin-right:6px;
 			float:left;
 		}
-		#submitbut:hover {
+		.submitbut:hover {
 			cursor:hand;
 			cursor:pointer;
 			display:block;
@@ -526,7 +483,7 @@ fill:white;
 			float:left;
 		}
 		#notesdiv {
-			max-width:480px;
+			max-width:800px;
 		}
 
 		.nav-pills {
@@ -614,18 +571,18 @@ fill:white;
   <div id="ChartFooterDiv">Note:</div>
    <div id="notesdiv">
    <ol>
-        <li>1. Note1</li>
-        <li>2. Note2...</li>
+        <li>Note</li>
+        <li>Note</li>
    </ol>
 	</div>
 
-<!--    <div id="ChartFooterDiv">Download this map</div>
+    <div id="ChartFooterDiv">Download this chart</div>
 
-    <a href="fallback.png" target="_blank"><div id="submitbut">Image</div></a>
-    <a href="Personal_wellbeing_2016.xls" target="_blank"><div id="submitbut">.xls</div></a>-->
+            <a href="fallback.png" target="_blank"><div class="submitbut">Image</div></a>
+            <a href="data.csv" target="_blank"><div class="submitbut">.csv</div></a>
+            <a href="data.xls" target="_blank"><div class="submitbut">.xls</div></a>
 
-
-
+    </div>
 
 
     <script src="https://cdn.ons.gov.uk/vendor/jquery/2.1.4/jquery.min.js"></script>
